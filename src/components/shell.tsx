@@ -9,7 +9,7 @@ const navigation=[
  {label:'Meta Ads',href:'/meta-ads',icon:Megaphone}, {label:'Finanzas',href:'/finanzas',icon:Wallet},
  {label:'Analytics',href:'/analytics',icon:BarChart3}, {label:'CRO',href:'/cro',icon:Layers3},
  {label:'Recomendaciones',href:'/recomendaciones',icon:BrainCircuit}, {label:'Experimentos',href:'/experimentos',icon:FlaskConical},
- {label:'Memoria',href:'/memoria',icon:BookOpen}, {label:'Configuración',href:'/configuracion',icon:Settings2},
+ {label:'Memoria',href:'/memoria',icon:BookOpen}, {label:'Cargar información',href:'/informacion',icon:BookOpen}, {label:'Configuración',href:'/configuracion',icon:Settings2},
 ];
 export function Shell({children}:{children:React.ReactNode}){
  const pathname=usePathname(); const [open,setOpen]=useState(false); const [isMobile,setIsMobile]=useState(false); const {data,storageError}=useDemo();
@@ -27,11 +27,11 @@ export function Shell({children}:{children:React.ReactNode}){
    <div className="workspace"><span className="workspace-avatar">P</span><div>Purfect Tienda Felina<small>Tu espacio de trabajo</small></div><ChevronDown size={14}/></div>
    <div className="nav-label">GENERAL</div>
    <nav>{navigation.map(({label,href,icon:Icon},i)=><div key={href}>{i===2&&<div className="nav-label">TU EQUIPO</div>}{i===6&&<div className="nav-label">GESTIÓN</div>}<Link className={`nav-item ${pathname===href?'active':''}`} href={href} aria-current={pathname===href?'page':undefined}><Icon size={18}/><span>{label}</span>{label==='Recomendaciones'&&<span className="nav-count">{pending}</span>}</Link></div>)}</nav>
-   <div className="sidebar-bottom"><div className="safe-mode"><ShieldCheck size={17}/><span>Vos tenés el control<small>Cada acción necesita tu aprobación.</small></span></div><Link className="help-link" href="/documentacion"><CircleHelp size={17}/>Cómo funciona la Agencia<ArrowUpRight size={14}/></Link><div className="profile"><span className="profile-avatar">NM</span><div>Nilo Mellone<small>Administrador · Demo</small></div><span className="version">V0.1</span></div></div>
+   <div className="sidebar-bottom"><div className="safe-mode"><ShieldCheck size={17}/><span>Vos tenés el control<small>Cada acción necesita tu aprobación.</small></span></div><Link className="help-link" href="/documentacion"><CircleHelp size={17}/>Cómo funciona la Agencia<ArrowUpRight size={14}/></Link><div className="profile"><span className="profile-avatar">NM</span><div>Nilo Mellone<small>Espacio local</small></div><span className="version">V0.2</span></div></div>
   </aside>
-  <div className="app-main" inert={isMobile&&open}><header className="topbar"><div className="breadcrumb"><button ref={menuRef} className="icon-button menu-button" aria-label="Abrir navegación" aria-expanded={open} onClick={()=>setOpen(true)}><Menu size={21}/></button><PanelLeftClose size={18} className="desktop-icon"/><span>Agencia IA</span><ChevronRight size={14}/><strong>{navigation.find(n=>n.href===pathname)?.label||'Documentación'}</strong></div><div className="topbar-right"><span className="demo-chip"><span/>MODO DEMO</span><Link className="header-help" href="/documentacion" aria-label="Ver documentación"><CircleHelp size={19}/></Link><span className="tiny-avatar">N</span></div></header>
+  <div className="app-main" inert={isMobile&&open}><header className="topbar"><div className="breadcrumb"><button ref={menuRef} className="icon-button menu-button" aria-label="Abrir navegación" aria-expanded={open} onClick={()=>setOpen(true)}><Menu size={21}/></button><PanelLeftClose size={18} className="desktop-icon"/><span>Agencia IA</span><ChevronRight size={14}/><strong>{navigation.find(n=>n.href===pathname)?.label||'Documentación'}</strong></div><div className="topbar-right"><span className="demo-chip"><span/>{pathname==='/informacion'||pathname==='/'?'V0 · LOCAL':'MODO DEMO'}</span><Link className="header-help" href="/documentacion" aria-label="Ver documentación"><CircleHelp size={19}/></Link><span className="tiny-avatar">N</span></div></header>
    <main id="main-content" tabIndex={-1}>{storageError&&<div role="alert" className="warning">{storageError}</div>}{children}</main>
-   <footer className="app-footer"><span>Purfect · Un equipo, decisiones coordinadas.</span><span><Activity size={13}/>V0 visual · Sin integraciones activas</span></footer>
+   <footer className="app-footer"><span>Purfect · Un equipo, decisiones coordinadas.</span><span><Activity size={13}/>V0 · Carga local · Integraciones pendientes</span></footer>
   </div>
  </div>;
 }

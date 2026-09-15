@@ -5,15 +5,20 @@ import { useState } from 'react';
 import { ArrowRight, ArrowUpRight, CalendarDays, ChartNoAxesCombined, ChevronRight, CircleAlert, FlaskConical, Lightbulb, Megaphone, Send, ShieldCheck, ShoppingBag, Sparkles, TrendingUp, Wallet } from 'lucide-react';
 import { Badge, DemoNote, Metric, Panel, TextLink } from './ui';
 import { SalesChart, ChannelChart } from './charts';
+import { useBusiness } from './business-provider';
+import { BusinessSummary } from './business-summary';
 import { useDemo } from './demo-provider';
 import { agentInfo, getDemoMetrics } from '@/services/demo-data';
 import { formatMoney, formatNumber, formatPercent } from '@/services/finance';
 import { statusLabels } from '@/policies/decisions';
 export function Dashboard(){
+ const business=useBusiness();const [source,setSource]=useState<'auto'|'demo'|'own'>('auto');const own=source==='own'||(source==='auto'&&!!business.data.updatedAt);
  const [days,setDays]=useState(14);const m=getDemoMetrics(days); const {data,question,setQuestion}=useDemo();const router=useRouter();
  function ask(e:React.FormEvent){e.preventDefault();if(!question.trim())setQuestion('¿Qué cambiarías hoy para aumentar las ventas sin bajar margen?');router.push('/director');}
  return <>
-  <div className="dashboard-heading"><div><div className="eyebrow">TU NEGOCIO, EN PERSPECTIVA</div><h1>Hola, Nilo <span className="wave">👋</span></h1><p>Acá tenés el estado actual de Purfect y las principales oportunidades.</p></div><label className="date-select"><CalendarDays size={16}/><select aria-label="Período del dashboard" value={days} onChange={e=>setDays(Number(e.target.value))}><option value={14}>1–14 sep, 2026</option><option value={7}>8–14 sep, 2026</option></select></label></div>
+  <div className="data-source"><label>Información del Inicio<select aria-label="Información del Inicio" value={own?'own':'demo'} onChange={e=>setSource(e.target.value as 'own'|'demo')}><option value="own">Mis datos cargados</option><option value="demo">Ejemplo demo</option></select></label><TextLink href="/informacion">Cargar información</TextLink></div>
+  <div className="dashboard-heading"><div><div className="eyebrow">TU NEGOCIO, EN PERSPECTIVA</div><h1>Hola, Nilo <span className="wave">👋</span></h1><p>Acá tenés el estado actual de Purfect y las principales oportunidades.</p></div>{!own&&<label className="date-select"><CalendarDays size={16}/><select aria-label="Período del dashboard" value={days} onChange={e=>setDays(Number(e.target.value))}><option value={14}>1–14 sep, 2026</option><option value={7}>8–14 sep, 2026</option></select></label>}</div>
+  {own?<BusinessSummary/>:<>
   <div className="demo-strip"><span><span className="demo-dot"/>Estás explorando la versión demo</span><span>Datos de ejemplo · ARS<TextLink href="/configuracion">Ver conexiones</TextLink></span></div>
   <div className="metrics-grid">
    <Metric label="Ventas" value={formatMoney(m.revenue)} detail="Netas · datos demo" icon={Wallet}/>
@@ -29,5 +34,6 @@ export function Dashboard(){
   <Panel title="Recomendaciones prioritarias" action={<TextLink href="/recomendaciones">Ver todas</TextLink>}><div className="recommendation-list">{data.recommendations.slice(0,3).map((r,i)=><Link href="/recomendaciones" className="recommendation-row" key={r.id}><span className="rec-index">0{i+1}</span><div><h3>{r.title}</h3><span>{r.agent} · Prioridad {r.priority.toLowerCase()}</span></div><Badge tone={r.status==='CONFLICTED'?'orange':r.status==='APPROVED'?'green':'blue'}>{statusLabels[r.status]}</Badge></Link>)}</div><div className="approval-foot"><ShieldCheck size={15}/>Las recomendaciones siempre pasan por vos.</div></Panel></div>
   <Panel title="Experimentos en seguimiento" subtitle="Aprender con una pregunta y una métrica claras" action={<TextLink href="/experimentos">Ver experimentos</TextLink>}><div className="experiment-preview"><span className="experiment-icon"><FlaskConical size={22}/></span><div><h3>Circuito Felino: landing vs. ficha de producto</h3><p>Hipótesis de conversión · Ejemplo de seguimiento</p></div><div className="experiment-progress"><div><span>7 de 14 días simulados</span><strong>50%</strong></div><progress value={7} max={14}/></div><Badge tone="blue">En medición · demo</Badge><Link className="icon-button" aria-label="Abrir experimento Circuito Felino" href="/experimentos"><ArrowRight size={19}/></Link></div></Panel>
   <DemoNote/>
+ </>}
  </>;
 }

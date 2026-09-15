@@ -1,4 +1,4 @@
-# Agencia IA Purfect · V0.1
+# Agencia IA Purfect · V0.2
 
 Aplicación independiente de demostración, construida con Next.js App Router, TypeScript, React, Tailwind CSS, Recharts y Zod.
 
@@ -10,7 +10,7 @@ Aplicación independiente de demostración, construida con Next.js App Router, T
 - Validación, bloqueo, aprobación explícita y rechazo de recomendaciones demo.
 - Finanzas con cálculos determinísticos y simulador mensual.
 - Vistas de Meta Ads, Analytics, CRO, Experimentos, Memoria, Configuración y Documentación.
-- Datos completamente sintéticos. No contiene información extraída de las cuentas de Purfect.
+- Fixtures sintéticos separados de una carga manual local de información. No se extrae información de las cuentas de Purfect.
 
 **El Director NO llama todavía a un LLM.** Las conclusiones son fixtures explícitos. Las aprobaciones son locales al navegador y no ejecutan cambios externos. Supabase, autenticación, Agents SDK y conectores se incorporan en etapas futuras. La demo pública no debe recibir datos sensibles, claves ni datos de clientes.
 
@@ -93,3 +93,14 @@ No se instalaron dependencias de base de datos ni IA sin uso en esta V0. No se i
 
 - [Instalación oficial de Next.js](https://nextjs.org/docs/app/getting-started/installation)
 - [Tailwind en Next.js](https://nextjs.org/docs/app/getting-started/css)
+
+
+## Centro de información (V0.2)
+
+`/informacion` permite guardar el perfil comercial, catálogo CSV, métricas diarias CSV y documentos pegados como texto. Cada CSV tiene plantilla descargable, validación de todas las filas y confirmación de reemplazo de la tabla elegida. Los importes usan ARS netos de IVA y punto decimal, sin miles. Fechas ISO reales y únicas; SKU únicos. Se rechazan números negativos, infinitos y filas ambiguas.
+
+El Inicio ofrece «Mis datos cargados» y «Ejemplo demo». Los totales y la serie de datos propios se calculan desde la carga; no se inventan canales, recomendaciones ni utilidad sin costos fijos. El Director y las otras vistas siguen siendo simulaciones explícitas y NO interpretan la información cargada.
+
+Guardado separado en `purfect-business-v1`, esquema Zod versionado. Hasta 2000 productos, 3660 días, 50 documentos y 2 MB totales. Exportación y restauración JSON validadas. Una escritura fallida no reemplaza el estado guardado ni muestra éxito. La corrupción de un guardado bloquea la sobrescritura automática. Los documentos se muestran como texto sin ejecutar HTML.
+
+No hay carga al servidor, extracción de PDF/Word, conexión con Drive, IA real ni sincronización entre dispositivos. Preview y producción usan guardados separados por origen: cargar la información definitiva en la URL de producción y conservar respaldos. No ingresar credenciales ni información personal de clientes; el uso de datos sensibles compartidos requiere la siguiente etapa de autenticación y Supabase/RLS.
