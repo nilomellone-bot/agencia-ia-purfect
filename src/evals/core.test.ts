@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { calculateFinance } from '../services/finance';
+import { campaigns, getDemoMetrics } from '../services/demo-data';
+import { seedRecommendations } from '../workflows/demo-director';
+import { transitionDecision } from '../policies/decisions';
+const base={revenue:1000000,variableCosts:600000,adSpend:100000,fixedCosts:200000,orders:10,attributedRevenue:500000};
+test('financial metrics reconcile and advertising is counted once',()=>{const m=calculateFinance(base);assert.equal(m.contribution,400000);assert.equal(m.contributionRate,.4);assert.equal(m.operatingProfit,100000);assert.equal(m.breakEvenRevenue,750000);assert.equal(m.roas,5);assert.equal(m.mer,10);assert.equal(m.contributionRoasFloor,2.5);assert.equal(m.contributionCacCeiling,40000);});
+test('zero denominator and negative contribution never produce Infinity',()=>{const zero=calculateFinance({...base,revenue:0,variableCosts:0,orders:0,adSpend:0});assert.equal(zero.breakEvenRevenue,null);assert.equal(zero.roas,null);assert.equal(zero.contributionCacCeiling,null);const loss=calculateFinance({...base,variableCosts:1200000});assert.equal(loss.breakEvenRevenue,null);assert.equal(loss.contributionRoasFloor,null);});
+test('invalid money values are rejected',()=>{for(const revenue of [NaN,Infinity,-1])assert.throws(()=>calculateFinance({...base,revenue}));});
+test('campaign data reconciles to fourteen-day overview',()=>{const m=getDemoMetrics(14);assert.equal(campaigns.reduce((s,c)=>s+c.spend,0),m.adSpend);assert.equal(campaigns.reduce((s,c)=>s+c.revenue,0),m.attributedRevenue);});
+test('human approval is required and blockers cannot be skipped',()=>{const valid=seedRecommendations[0];assert.throws(()=>transitionDecision(valid,'APPROVED',false));assert.equal(transitionDecision(valid,'APPROVED',true).status,'APPROVED');assert.throws(()=>transitionDecision(seedRecommendations[1],'APPROVED',true));assert.throws(()=>transitionDecision({...valid,blockers:['Finance veto']},'APPROVED',true));assert.throws(()=>transitionDecision({...valid,status:'PROPOSED'},'APPROVED',true));});
+test('V0 cannot implement even an explicitly approved recommendation',()=>{assert.throws(()=>transitionDecision({...seedRecommendations[0],status:'APPROVED'},'IMPLEMENTED',true));assert.equal(transitionDecision(seedRecommendations[1],'REJECTED',false).status,'REJECTED');});

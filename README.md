@@ -1,1 +1,95 @@
-# agencia-ia-purfect
+# Agencia IA Purfect · V0.1
+
+Aplicación independiente de demostración, construida con Next.js App Router, TypeScript, React, Tailwind CSS, Recharts y Zod.
+
+## Alcance
+
+- Inicio con indicadores, gráficos, canales, especialistas, recomendaciones y experimento demo.
+- Director con consulta secuencial simulada a Meta Ads, Finanzas, Analytics y CRO.
+- Expedientes con objetivo, período, baseline, fuentes, hallazgos, contradicciones, recomendaciones y auditoría.
+- Validación, bloqueo, aprobación explícita y rechazo de recomendaciones demo.
+- Finanzas con cálculos determinísticos y simulador mensual.
+- Vistas de Meta Ads, Analytics, CRO, Experimentos, Memoria, Configuración y Documentación.
+- Datos completamente sintéticos. No contiene información extraída de las cuentas de Purfect.
+
+**El Director NO llama todavía a un LLM.** Las conclusiones son fixtures explícitos. Las aprobaciones son locales al navegador y no ejecutan cambios externos. Supabase, autenticación, Agents SDK y conectores se incorporan en etapas futuras. La demo pública no debe recibir datos sensibles, claves ni datos de clientes.
+
+## Ejecutar
+
+Requisitos: Node.js 22 o superior y npm.
+
+```bash
+npm ci
+npm run dev
+```
+
+## Verificar
+
+```bash
+npm test
+npm run build
+npm start
+```
+
+Las pruebas verifican cálculos, denominadores cero, entradas inválidas, conciliación de fixtures, bloqueos, aprobación explícita y prohibición de implementar en V0.
+
+## Deployment Vercel
+
+Proyecto previsto: `agencia-ia-purfect` en `nilomellone-bots-projects`.
+
+La **raíz del proyecto** es esta carpeta: aquí están `package.json` y `package-lock.json`. En el repositorio de GitHub deben quedar en la raíz, no dentro de una segunda carpeta `agencia-ia-purfect`.
+
+Configuración:
+
+- Framework: Next.js.
+- Root Directory: raíz del repositorio, vacío o `.`.
+- Install Command: `npm ci`.
+- Build Command: `npm run build`.
+- Output Directory: valor predeterminado de Next.js; no configurarlo como `out`.
+- No hacen falta variables de entorno para esta V0.
+
+El error previo `No Next.js version detected` y la captura de un deployment de un solo archivo indican que Vercel no estaba recibiendo un proyecto Next.js completo o no estaba construyendo desde su raíz. El ajuste exacto remoto debe confirmarse con acceso al proyecto. Este paquete incluye Next.js en dependencies y el build local pasa.
+
+Flujo: verificar localmente → conectar exclusivamente este proyecto → desplegar preview → verificar interfaz y consola → promover a producción → verificar dominio. No modificar otros repositorios ni aplicaciones de Purfect.
+
+## Datos y cálculos
+
+Todos los importes del motor están en ARS netos de IVA, descuentos y devoluciones; corresponden al mismo período. Los costos variables excluyen pauta para evitar descontarla dos veces.
+
+- Contribución = ventas − costos variables sin pauta.
+- Margen de contribución = contribución / ventas.
+- Resultado operativo = contribución − costos fijos − pauta.
+- Equilibrio = (costos fijos + pauta) / margen, con margen positivo.
+- ROAS atribuido = ventas atribuidas / pauta; no equivale a incrementalidad.
+- MER = ventas totales / pauta.
+- Piso ROAS de contribución = 1 / margen. Excluye cobertura de costos fijos y beneficio objetivo.
+- Techo CAC de contribución = ticket × margen, bajo supuesto explícito de clientes nuevos. No es CAC máximo rentable completo.
+
+Sin denominador válido se devuelve `null`, nunca infinito. No se infiere utilidad neta sin impuestos y gastos completos. Los indicadores del Inicio y las campañas concilian para los 14 días de la fixture. El selector de 7 días filtra la serie; Finanzas usa un escenario mensual separado y claramente rotulado.
+
+## Organización del código
+
+- `src/app`: rutas, layouts, CSS y metadatos.
+- `src/components`: interfaz y proveedor local de demostración.
+- `src/services`: métricas determinísticas y fixtures.
+- `src/schemas`: validación Zod y Decision Case.
+- `src/policies`: transiciones, bloqueos y aprobación.
+- `src/workflows`: orquestación demo y expediente inicial.
+- `src/evals`: pruebas de invariantes financieras y de permisos.
+
+## Persistencia y límites de seguridad
+
+LocalStorage, clave `purfect-agency-demo-v1`, esquema versionado validado con Zod. Se captura el fallo de almacenamiento y se informa en pantalla. No se sincroniza entre dispositivos; no es auditoría inviolable ni control de acceso para datos reales. No hay endpoints de escritura externos ni credenciales.
+
+Antes de datos reales: autenticación, organizaciones y usuarios, autorización del servidor, Supabase con RLS, auditoría persistente, snapshots inmutables, idempotencia, validación de permisos y separación entre proponer/aprobar/ejecutar.
+
+## Arquitectura objetivo (próxima etapa)
+
+Manager / Blackboard: ingesta, normalización, SQL/TypeScript, validación y permisos determinísticos. Director del servidor consulta especialistas con `agent.asTool()` del OpenAI Agents SDK TypeScript, bajo un expediente y un snapshot compartido. No habrá conversación libre entre especialistas. Analytics y Finanzas pueden bloquear; el Director no puede anular el bloqueo. Operations añadirá límites de capacidad más adelante.
+
+No se instalaron dependencias de base de datos ni IA sin uso en esta V0. No se implementaron tablas vacías ni conectores simulados presentados como activos. pgvector se reserva para una necesidad real de recuperación documental.
+
+## Referencias técnicas
+
+- [Instalación oficial de Next.js](https://nextjs.org/docs/app/getting-started/installation)
+- [Tailwind en Next.js](https://nextjs.org/docs/app/getting-started/css)
