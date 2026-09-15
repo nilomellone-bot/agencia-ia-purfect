@@ -1,4 +1,4 @@
-# Agencia IA Purfect · V0.2
+# Agencia IA Purfect · V0.3
 
 Aplicación independiente de demostración, construida con Next.js App Router, TypeScript, React, Tailwind CSS, Recharts y Zod.
 
@@ -12,7 +12,7 @@ Aplicación independiente de demostración, construida con Next.js App Router, T
 - Vistas de Meta Ads, Analytics, CRO, Experimentos, Memoria, Configuración y Documentación.
 - Fixtures sintéticos separados de una carga manual local de información. No se extrae información de las cuentas de Purfect.
 
-**El Director NO llama todavía a un LLM.** Las conclusiones son fixtures explícitos. Las aprobaciones son locales al navegador y no ejecutan cambios externos. Supabase, autenticación, Agents SDK y conectores se incorporan en etapas futuras. La demo pública no debe recibir datos sensibles, claves ni datos de clientes.
+**El Director NO llama todavía a un LLM.** Las conclusiones son fixtures explícitos. Las aprobaciones son locales al navegador y no ejecutan cambios externos. Supabase y autenticación están disponibles para copias privadas de información; Agents SDK y conectores de negocio se incorporan en etapas futuras. La demo pública no debe recibir datos sensibles, claves ni datos de clientes.
 
 ## Ejecutar
 
@@ -87,7 +87,7 @@ Antes de datos reales: autenticación, organizaciones y usuarios, autorización 
 
 Manager / Blackboard: ingesta, normalización, SQL/TypeScript, validación y permisos determinísticos. Director del servidor consulta especialistas con `agent.asTool()` del OpenAI Agents SDK TypeScript, bajo un expediente y un snapshot compartido. No habrá conversación libre entre especialistas. Analytics y Finanzas pueden bloquear; el Director no puede anular el bloqueo. Operations añadirá límites de capacidad más adelante.
 
-No se instalaron dependencias de base de datos ni IA sin uso en esta V0. No se implementaron tablas vacías ni conectores simulados presentados como activos. pgvector se reserva para una necesidad real de recuperación documental.
+La integración de Supabase se limita al acceso y las copias privadas de información. No se instalaron dependencias de IA sin uso. No se implementaron tablas vacías ni conectores simulados presentados como activos. pgvector se reserva para una necesidad real de recuperación documental.
 
 ## Referencias técnicas
 
@@ -103,4 +103,17 @@ El Inicio ofrece «Mis datos cargados» y «Ejemplo demo». Los totales y la ser
 
 Guardado separado en `purfect-business-v1`, esquema Zod versionado. Hasta 2000 productos, 3660 días, 50 documentos y 2 MB totales. Exportación y restauración JSON validadas. Una escritura fallida no reemplaza el estado guardado ni muestra éxito. La corrupción de un guardado bloquea la sobrescritura automática. Los documentos se muestran como texto sin ejecutar HTML.
 
-No hay carga al servidor, extracción de PDF/Word, conexión con Drive, IA real ni sincronización entre dispositivos. Preview y producción usan guardados separados por origen: cargar la información definitiva en la URL de producción y conservar respaldos. No ingresar credenciales ni información personal de clientes; el uso de datos sensibles compartidos requiere la siguiente etapa de autenticación y Supabase/RLS.
+La carga inicial es local. La V0.3 añade una copia privada manual por usuario en Supabase. No hay extracción de PDF/Word, conexión con Drive ni IA real. Preview y producción usan guardados separados por origen: cargar la información definitiva en la URL de producción y conservar respaldos. No ingresar credenciales ni información personal de clientes; el uso de datos sensibles compartidos requiere la siguiente etapa de autenticación y Supabase/RLS.
+
+
+## Copia privada Supabase (V0.3)
+
+Proyecto dedicado: `mvxjxzadpdgaqkbccwmw`, organización PURFECT_ IA. Solo se aplica `src/db/private-information.sql`; el esquema genérico de decisiones es una propuesta y no debe exponerse sin políticas de organización/aprobación.
+
+`/acceso` usa email y contraseña de un usuario habilitado en Supabase Auth. No hay registro público en la interfaz. La cuenta de administración de Supabase no crea un usuario de la Agencia: habilitar el primer acceso en Authentication > Users > Add user > Create new user. El dueño elige su contraseña allí y la usa en `/acceso`; nunca guardarla en archivos o compartirla por chat.
+
+El Centro de información ofrece guardar una copia privada y restaurarla entre dispositivos. Es una acción explícita; no hay sincronización automática. Cada usuario tiene su propia fila; no hay espacio compartido entre distintos usuarios todavía. La copia local persiste al cerrar sesión: es un equipo de confianza y permite exportar antes de transferir información.
+
+El endpoint `/api/informacion` valida el JWT con Auth, rechaza anónimos y valida los datos con Zod. La tabla aplica RLS por propietario, no tiene privilegios para anon, y las actualizaciones comprueban revisión para evitar sobrescrituras concurrentes. No usa service_role. URL y clave publishable son públicas por diseño y se pueden sustituir con NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
+
+La lógica de dominio depende del contrato BusinessStore; el adaptador Supabase está aislado en integrations. La conexión SQL Database sigue disponible para futuros servicios. Supabase Auth usa su propio almacenamiento de sesión; las credenciales no pasan por los formularios de información ni se guardan en el repositorio.
